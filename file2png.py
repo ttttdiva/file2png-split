@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
+import os
 import random
+import sys
 import tempfile
 import traceback
 from pathlib import Path
@@ -21,6 +24,17 @@ from file2png_common import (
     split_part_to_png_name,
 )
 from zipaspng import disguise_file
+
+
+RUN_LOG = WORK_DIR / "file2png-run.log"
+ERROR_LOG = WORK_DIR / "file2png-error.log"
+
+
+def append_run_log(message: str) -> None:
+    WORK_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = dt.datetime.now().isoformat(timespec="seconds")
+    with RUN_LOG.open("a", encoding="utf-8") as log:
+        log.write(f"[{timestamp}] {message}\n")
 
 
 def parse_args() -> argparse.Namespace:
@@ -160,12 +174,18 @@ def run() -> int:
 
 
 if __name__ == "__main__":
+    append_run_log(f"START cwd={os.getcwd()} argv={sys.argv!r}")
     try:
-        raise SystemExit(run())
+        exit_code = run()
+        append_run_log(f"OK exit={exit_code}")
+        raise SystemExit(exit_code)
+    except SystemExit as exc:
+        append_run_log(f"EXIT code={exc.code}")
+        raise
     except Exception:
         WORK_DIR.mkdir(parents=True, exist_ok=True)
-        log_path = WORK_DIR / "file2png-error.log"
-        log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        ERROR_LOG.write_text(traceback.format_exc(), encoding="utf-8")
+        append_run_log(f"ERROR see={ERROR_LOG}")
         traceback.print_exc()
-        print(f"Error log: {log_path}")
+        print(f"Error log: {ERROR_LOG}")
         raise SystemExit(1)
