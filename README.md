@@ -34,20 +34,21 @@ python png2file.py --src <PNGファイル群>
 ## As/r設定
 
 As/rからは、このリポジトリ内のスクリプトを直接呼び出します。
-`Run` には、PATH上の `python.exe` を指定します。
+`Run` には、Pythonの実行ファイルをフルパスで指定します。
+ユーザー名の直書きを避けるため、OS環境変数 `%USERPROFILE%` を使います。
 
 `C:\Asr\Ubar\ponjorapi\Script\file2png.txt`
 
 ```text
 CommandLineOption="D:\Dev\06_file2png-split\file2png.py" "--src" ?SelFile?
-Run=python.exe
+Run=%USERPROFILE%\AppData\Local\Programs\Python\Python310\python.exe
 ```
 
 `C:\Asr\Ubar\ponjorapi\Script\png2file.txt`
 
 ```text
 CommandLineOption="D:\Dev\06_file2png-split\png2file.py" "--src" ?SelFile?
-Run=python.exe
+Run=%USERPROFILE%\AppData\Local\Programs\Python\Python310\python.exe
 ```
 
 `C:\Asr\Plugin\External_Script\file2png.py` などのコピーは置かず、As/rからもこのリポジトリ内の実体を直接呼び出す想定です。
