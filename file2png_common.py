@@ -71,7 +71,10 @@ def list_base_pngs(base_dir: Path) -> list[Path]:
     return pngs
 
 
-def prepare_output_dir(output_dir: Path, replace: bool) -> None:
+def prepare_output_dir(output_dir: Path, replace: bool, protected_path: Path | None = None) -> None:
+    if protected_path is not None and output_dir.resolve() == protected_path.resolve():
+        raise ValueError(f"Refusing to use the source path as the output directory: {output_dir}")
+
     if output_dir.exists() and any(output_dir.iterdir()):
         if not replace:
             raise FileExistsError(

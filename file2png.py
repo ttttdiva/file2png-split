@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import random
 import tempfile
+import traceback
 from pathlib import Path
 
 from file2png_common import (
@@ -35,7 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         default=None,
-        help=f"Output root directory. Default: {OUTPUT_DIR}",
+        help="Output root directory. Default: beside each source as '<name>_png'.",
     )
     parser.add_argument(
         "--work-dir",
@@ -87,7 +88,7 @@ def split_archive_parts(work_path: Path, source_name: str) -> list[Path]:
 def embed_source(
     source: Path,
     base_pngs: list[Path],
-    output_root: Path,
+    output_root: Path | None,
     work_root: Path,
     seven_zip: Path,
     volume_size: str,
@@ -97,8 +98,8 @@ def embed_source(
         raise FileNotFoundError(f"Source does not exist: {source}")
 
     source = source.resolve()
-    output_dir = output_root / source.name
-    prepare_output_dir(output_dir, replace=replace)
+    output_dir = (output_root / source.name) if output_root else (source.parent / f"{source.name}_png")
+    prepare_output_dir(output_dir, replace=replace, protected_path=source)
 
     with tempfile.TemporaryDirectory(
         prefix=safe_temp_prefix(source.name), dir=work_root
@@ -126,10 +127,11 @@ def embed_source(
 def run() -> int:
     args = parse_args()
     base_dir = resolve_dir(args.base_dir, BASE_DIR)
-    output_root = resolve_dir(args.output_dir, OUTPUT_DIR)
+    output_root = resolve_dir(args.output_dir, OUTPUT_DIR) if args.output_dir else None
     work_root = resolve_dir(args.work_dir, WORK_DIR)
     ensure_work_dir(work_root)
-    output_root.mkdir(parents=True, exist_ok=True)
+    if output_root:
+        output_root.mkdir(parents=True, exist_ok=True)
 
     base_pngs = list_base_pngs(base_dir)
     seven_zip = find_7zip()
@@ -137,7 +139,7 @@ def run() -> int:
 
     print(f"Tool root: {Path(__file__).resolve().parent}")
     print(f"Base PNGs: {base_dir}")
-    print(f"Outputs: {output_root}")
+    print(f"Outputs: {output_root or 'beside each source'}")
     print(f"Work: {work_root}")
     print(f"7-Zip: {seven_zip}")
     print(f"Will embed {len(sources)} source(s)")
@@ -161,7 +163,9 @@ if __name__ == "__main__":
     try:
         raise SystemExit(run())
     except Exception:
-        import traceback
-
+        WORK_DIR.mkdir(parents=True, exist_ok=True)
+        log_path = WORK_DIR / "file2png-error.log"
+        log_path.write_text(traceback.format_exc(), encoding="utf-8")
         traceback.print_exc()
+        print(f"Error log: {log_path}")
         raise SystemExit(1)
