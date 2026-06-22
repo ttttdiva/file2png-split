@@ -21,8 +21,6 @@ PNGに埋め込む:
 py -3 file2png.py --src <ファイルまたはフォルダ>
 ```
 
-As/rなどの外部ツールから呼ぶ場合は、Pythonのインストール先を直指定せず `file2png-asr.bat` を呼び出します。
-
 出力先は、標準では入力ファイルまたはフォルダの隣に作る `<元ファイル名>_png/` です。既に同名の出力フォルダがあり、中身が残っている場合は停止します。置き換えたい場合は `--replace` を付けます。
 
 PNGから取り出す:
@@ -35,23 +33,29 @@ py -3 png2file.py --src <PNGファイル群>
 
 ## As/r設定
 
+先に環境変数 `FILE2PNG_ROOT` に、このリポジトリのパスを設定します。
+
+```powershell
+setx FILE2PNG_ROOT "D:\Dev\06_file2png-split"
+```
+
+As/rを起動済みの場合は、環境変数を反映するためにAs/rを再起動してください。
+
 `C:\Asr\Ubar\ponjorapi\Script\file2png.txt`
 
 ```text
-CommandLineOption=?SelFile?
-Run=<clone path>\file2png-asr.bat
+CommandLineOption="-3" "%FILE2PNG_ROOT%\file2png.py" "--src" ?SelFile?
+Run=%SystemRoot%\py.exe
 ```
 
 `C:\Asr\Ubar\ponjorapi\Script\png2file.txt`
 
 ```text
-CommandLineOption=?SelFile?
-Run=<clone path>\png2file-asr.bat
+CommandLineOption="-3" "%FILE2PNG_ROOT%\png2file.py" "--src" ?SelFile?
+Run=%SystemRoot%\py.exe
 ```
 
 `C:\Asr\Plugin\External_Script\file2png.py` などのコピーは置かず、As/rからもこのリポジトリ内の実体を直接呼び出す想定です。
-
-batランチャーは、まず `py.exe -3` を探し、無ければ `python.exe` を探します。起動状況は `work/file2png-launcher.log` または `work/png2file-launcher.log` に残ります。
 
 ## 7-Zip
 
