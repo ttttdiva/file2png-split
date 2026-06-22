@@ -18,7 +18,7 @@
 PNGに埋め込む:
 
 ```powershell
-py -3 file2png.py --src <ファイルまたはフォルダ>
+python file2png.py --src <ファイルまたはフォルダ>
 ```
 
 出力先は、標準では入力ファイルまたはフォルダの隣に作る `<元ファイル名>_png/` です。既に同名の出力フォルダがあり、中身が残っている場合は停止します。置き換えたい場合は `--replace` を付けます。
@@ -26,33 +26,28 @@ py -3 file2png.py --src <ファイルまたはフォルダ>
 PNGから取り出す:
 
 ```powershell
-py -3 png2file.py --src <PNGファイル群>
+python png2file.py --src <PNGファイル群>
 ```
 
 復元先は、選択したPNGがあるフォルダです。既存ファイルは標準では上書きせずスキップします。上書きしたい場合は `--overwrite` を付けます。
 
 ## As/r設定
 
-先に環境変数 `FILE2PNG_ROOT` に、このリポジトリのパスを設定します。
-
-```powershell
-setx FILE2PNG_ROOT "D:\Dev\06_file2png-split"
-```
-
-As/rを起動済みの場合は、環境変数を反映するためにAs/rを再起動してください。
+As/rからは、このリポジトリ内のスクリプトを直接呼び出します。
+`Run` には、PATH上の `python.exe` を指定します。
 
 `C:\Asr\Ubar\ponjorapi\Script\file2png.txt`
 
 ```text
-CommandLineOption="-3" "%FILE2PNG_ROOT%\file2png.py" "--src" ?SelFile?
-Run=%SystemRoot%\py.exe
+CommandLineOption="D:\Dev\06_file2png-split\file2png.py" "--src" ?SelFile?
+Run=python.exe
 ```
 
 `C:\Asr\Ubar\ponjorapi\Script\png2file.txt`
 
 ```text
-CommandLineOption="-3" "%FILE2PNG_ROOT%\png2file.py" "--src" ?SelFile?
-Run=%SystemRoot%\py.exe
+CommandLineOption="D:\Dev\06_file2png-split\png2file.py" "--src" ?SelFile?
+Run=python.exe
 ```
 
 `C:\Asr\Plugin\External_Script\file2png.py` などのコピーは置かず、As/rからもこのリポジトリ内の実体を直接呼び出す想定です。
