@@ -21,6 +21,8 @@ PNGに埋め込む:
 py -3 file2png.py --src <ファイルまたはフォルダ>
 ```
 
+As/rなどの外部ツールから呼ぶ場合は、Pythonのインストール先を直指定せず `file2png-asr.bat` を呼び出します。
+
 出力先は、標準では入力ファイルまたはフォルダの隣に作る `<元ファイル名>_png/` です。既に同名の出力フォルダがあり、中身が残っている場合は停止します。置き換えたい場合は `--replace` を付けます。
 
 PNGから取り出す:
@@ -36,18 +38,20 @@ py -3 png2file.py --src <PNGファイル群>
 `C:\Asr\Ubar\ponjorapi\Script\file2png.txt`
 
 ```text
-CommandLineOption="-3" "<clone path>\file2png.py" "--src" ?SelFile?
-Run=C:\Windows\py.exe
+CommandLineOption=?SelFile?
+Run=<clone path>\file2png-asr.bat
 ```
 
 `C:\Asr\Ubar\ponjorapi\Script\png2file.txt`
 
 ```text
-CommandLineOption="-3" "<clone path>\png2file.py" "--src" ?SelFile?
-Run=C:\Windows\py.exe
+CommandLineOption=?SelFile?
+Run=<clone path>\png2file-asr.bat
 ```
 
 `C:\Asr\Plugin\External_Script\file2png.py` などのコピーは置かず、As/rからもこのリポジトリ内の実体を直接呼び出す想定です。
+
+batランチャーは、まず `py.exe -3` を探し、無ければ `python.exe` を探します。起動状況は `work/file2png-launcher.log` または `work/png2file-launcher.log` に残ります。
 
 ## 7-Zip
 
